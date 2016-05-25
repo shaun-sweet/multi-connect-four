@@ -36,7 +36,10 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var redis   = require("redis");
-var client  = redis.createClient();
+var client = redis.createClient({ host: "ec2-54-163-252-131.compute-1.amazonaws.com",
+    port: 6799,
+    password: "p4snntfu6bami7bbnb5bd8esj2g"
+});
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req,res){

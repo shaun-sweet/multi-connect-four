@@ -3,29 +3,33 @@ $(document).ready(function(){
   var lock = true;
   var socket = io();
 
+  
   socket.on('game-id', function(msg){
-    $('#game-id').html(msg);
-    $('#matching').hide();
-    $('#found-game').html("Game found!");
-    $('#found-game').fadeIn();
-    $('#found-game').hide().html("Pairing...").fadeIn();
-    $('#found-game').hide();
-    $('.board-container').fadeIn();
-    lock = false;
-  });
+   $('#game-id').html(msg);
+   $('#matching').hide();
+   $('#found-game').html("Game found!");
+   $('#found-game').fadeIn();
+   setTimeout(function(){
+     $('#found-game').hide().html("Pairing...").fadeIn();
+     setTimeout(function(){
+       $('#found-game').hide();
+       $('.board-image').fadeIn();
+      }, 1000);  
+   }, 1000);  
+   lock = false;
 
+ });
   socket.on('matching', function(msg){
     $('#matching').show();
     $('#matching').html(msg);
-
   });
 
   socket.on('message', function(msg){
   // needs on message criteria
   receivedMessage = JSON.parse(msg);
-    if (receivedMessage.column){
-      if (!newGame.checkWin()){
-       var column = receivedMessage.column;
+  if (receivedMessage.column){
+    if (!newGame.checkWin()){
+     var column = receivedMessage.column;
         // saves the return value (where the actual peice can drop) and alters
         // the "backend" javascript board
         var cell = newGame.playTurn(Number(column))
@@ -52,17 +56,7 @@ $(document).ready(function(){
     jsonObject = JSON.stringify({gameId: $("#game-id").html(),column: column});
     socket.emit("message", jsonObject);}
   })
-   $('#new-game-button').click(function() {
-    location.reload();
-  });
+ $('#new-game-button').click(function() {
+  location.reload();
+});
 })
-
-
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}

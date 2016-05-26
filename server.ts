@@ -62,6 +62,7 @@ io.on('connection', function(socket){
             client.hmget(game.gameId, 'player1', 'player2', function(err, reply){
                 var player1 = reply[0];
                 var player2 = reply[1];
+
                 io.sockets.connected[player1].emit('message', msg);
                 io.sockets.connected[player2].emit('message', msg);
                 io.sockets.connected[socket.id].emit('message', JSON.stringify({lock: true}));
@@ -91,14 +92,18 @@ var createGame = function(){
                 client.lpop("gameQueue", function(err, player2){
                     inQueue = inQueue - 1;
                     client.get("gameId", function(err, id){
-                        client.hmset(id, "player1", player1, "player2", player2);
-                        console.log("player1: " + player1);
-                        console.log("player2: " + player2);
-                        io.sockets.connected[player1].emit('game-id', String(id));
-                        io.sockets.connected[player2].emit('game-id', String(id));
-                        gameInstantiating = false;
-                        console.log("In Queue: "+ inQueue);
-                        createGame();
+                        if(player1 == null || player2 == null) {
+                            createGame();
+                        }else{
+                            client.hmset(id, "player1", player1, "player2", player2);
+                            console.log("player1: " + player1);
+                            console.log("player2: " + player2);
+                            io.sockets.connected[player1].emit('game-id', String(id));
+                            io.sockets.connected[player2].emit('game-id', String(id));
+                            gameInstantiating = false;
+                            console.log("In Queue: " + inQueue);
+                            createGame();
+                                            };
                     });
                 });
             });
